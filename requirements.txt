@@ -1,4 +1,4 @@
-emoji==2.2.0
+emoji==1.7.0
 matplotlib==3.5.3
 nltk==3.8.1
 numpy==1.21.6
