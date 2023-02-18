@@ -67,9 +67,7 @@ def create_word_cloud(selected_user,df):
     # Creating a function to remove emoji from the message
     messages = df['message']
     def clean_emoji(text):
-        # Remove emojis
         emoji_list = []
-        text = emoji.get_emoji_regexp().sub(r'', text)
         # Remove non-ASCII characters
         text = re.sub(r'[^\x00-\x7f]', r'', text)
         emoji_list.append(text)
