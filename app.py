@@ -183,11 +183,12 @@ if uploaded_file is not None:
         # Identify the person with the most messages sent during early morning hours
         early_bird = df[(df['hour'] >= 5) & (df['hour'] < 9)].groupby('user').size().idxmax()
 
+        # To display message differently in a group and personal chat
         unique_user = df['user'].unique()
-        if len(unique_user) > 3:
+        if len(unique_user) > 3: # For Group Chat
             st.subheader(f"{early_bird} is the early bird in the group.")
             st.subheader(f"{night_owl} is the night owl in the group.")
-        else:
+        else:                    # For Personal Chat
             st.subheader(f"{early_bird} is the early bird.")
             st.subheader(f"{night_owl} is the night owl.")
 
