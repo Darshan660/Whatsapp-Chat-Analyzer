@@ -177,9 +177,8 @@ def activity_heatmap(selected_user,df):
     sorted_columns = ['00-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10', '10-11',
                       '11-12','12-13', '13-14', '14-15', '15-16', '16-17', '17-18', '18-19',
                       '19-20', '20-21', '21-22', '22-23','23-00']
-    user_heatmap = user_heatmap.reindex(columns=sorted_columns)
+    user_heatmap = user_heatmap.reindex(columns=sorted_columns,fill_value=0)
     # As many users would not have chat in some time periods so the value will be NA for them so replacing it with 0
-    user_heatmap.fillna(0)
     return user_heatmap
 
 
