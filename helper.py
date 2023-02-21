@@ -66,7 +66,7 @@ def create_word_cloud(selected_user,df):
 
     # Creating a function to remove emoji from the message
     messages = df['message']
-    def clean_emoji(text):
+    def clean_non_ascii(text):
         emoji_list = []
         # Remove non-ASCII characters
         text = re.sub(r'[^\x00-\x7f]', r'', text)
@@ -76,7 +76,7 @@ def create_word_cloud(selected_user,df):
 
     wc = WordCloud(width=500,height=400,min_font_size=10,background_color='white')
     temp['message'] = temp['message'].apply(remove_stop_words)
-    temp['message'] = temp['message'].apply(clean_emoji)
+    temp['message'] = temp['message'].apply(clean_non_ascii)
     df_wc = wc.generate(temp['message'].str.cat(sep=" "))
     return df_wc
 
@@ -173,7 +173,13 @@ def activity_heatmap(selected_user,df):
         df = df[df['user'] == selected_user]
 
     user_heatmap = df.pivot_table(index='day_name', columns='period', values='message', aggfunc='count').fillna(0)
-
+    # Sorting the columns
+    sorted_columns = ['00-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10', '10-11',
+                      '11-12','12-13', '13-14', '14-15', '15-16', '16-17', '17-18', '18-19',
+                      '19-20', '20-21', '21-22', '22-23','23-00']
+    user_heatmap = user_heatmap.reindex(columns=sorted_columns)
+    # As many users would not have chat in some time periods so the value will be NA for them so replacing it with 0
+    user_heatmap.fillna(0)
     return user_heatmap
 
 
