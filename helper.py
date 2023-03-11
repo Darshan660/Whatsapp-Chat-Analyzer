@@ -103,6 +103,8 @@ def most_common_words(selected_user,df):
 
     temp = df[df['user'] != 'group_notification']
     temp = temp[temp['message'] != '<Media omitted>\n']
+    temp = temp.loc[~temp['message'].str.contains('This message was deleted')]  # Excluding the messages deleted by the user itslef
+    temp = temp.loc[~temp['message'].str.contains('deleted this message')]  # Excluding the messages deleted by other members in the group
 
     words = []
     for message in temp['message'].apply(clean_non_ascii_words):
