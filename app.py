@@ -125,7 +125,6 @@ try:
                 fig.update_layout(xaxis_title='Value', yaxis_title='Category',
                                   xaxis=dict(tickmode='auto', tick0=0, dtick=5))
 
-                st.title('Most Common Words')
                 st.plotly_chart(fig)
 
             # WordCloud
