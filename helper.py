@@ -95,6 +95,11 @@ def create_word_cloud(selected_user,df):
 
 def most_common_words(selected_user,df):
 
+    def clean_punctuations(text):
+        # use regular expression to exclude punctuations
+        text = re.sub(r'[^\w\s]', '', text)
+        return text
+
     f = open('stop_hinglish.txt','r')
     stop_words = f.read()
 
@@ -105,7 +110,7 @@ def most_common_words(selected_user,df):
     temp = temp[temp['message'] != '<Media omitted>\n']
     temp = temp.loc[~temp['message'].str.contains('This message was deleted')]  # Excluding the messages deleted by the user itslef
     temp = temp.loc[~temp['message'].str.contains('deleted this message')]  # Excluding the messages deleted by other members in the group
-
+    temp['message'] = temp['message'].apply(clean_punctuations) # To exclude punctuations
     words = []
     for message in temp['message'].apply(clean_non_ascii_words):
         for word in message.lower().split():
