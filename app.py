@@ -118,8 +118,8 @@ if uploaded_file is not None:
                                     insidetextanchor='middle',  # Position data labels in the center
                                     marker=dict(color='mediumseagreen'))) # Change bar color
         # Customize axis labels and tick values
-        fig.update_layout(xaxis_title='Value',yaxis_title='Category',xaxis_tickangle=-45,
-                          xaxis=dict(tickmode='linear',tick0=0,dtick=5))
+        fig.update_layout(xaxis_title='Value',yaxis_title='Category',xaxis_tickangle=-90,
+                          xaxis=dict(tickmode='auto',tick0=0,dtick=5))
 
         st.title('Most Common Words')
         st.plotly_chart(fig)
