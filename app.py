@@ -6,24 +6,24 @@ import plotly.graph_objs as go
 
 st.sidebar.title("Whatsapp Chat Analyzer")
 
-try:
-    uploaded_file = st.sidebar.file_uploader("Choose a file")
-    if uploaded_file is not None:
-        bytes_data = uploaded_file.getvalue()
-        data = bytes_data.decode("utf-8")
-        df = preprocessor.preprocess(data)
+uploaded_file = st.sidebar.file_uploader("Choose a file")
+if uploaded_file is not None:
+    bytes_data = uploaded_file.getvalue()
+    data = bytes_data.decode("utf-8")
+    df = preprocessor.preprocess(data)
 
-        # Fetching unique user
-        user_list = df['user'].unique().tolist()
+    # Fetching unique user
+    user_list = df['user'].unique().tolist()
 
-        if 'group_notification' in user_list:
-            user_list.remove('group_notification')
-        user_list.sort()
-        user_list.insert(0, "Overall")
-        selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
+    if 'group_notification' in user_list:
+        user_list.remove('group_notification')
+    user_list.sort()
+    user_list.insert(0, "Overall")
+    selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
 
-        if st.sidebar.button("Show Analysis"):
-            # Stats Area
+    if st.sidebar.button("Show Analysis"):
+        # Stats Area
+        try:
             num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
 
             st.title("Top Satistics")
@@ -42,7 +42,12 @@ try:
                 st.header("Links Shared")
                 st.title(num_links)
 
-            # Monthly Timeline
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
+
+
+        # Monthly Timeline
+        try:
             st.title("Monthly Timeline")
             timeline = helper.monthly_timeline(selected_user, df)
             fig, ax = plt.subplots()
@@ -58,8 +63,12 @@ try:
             plt.xticks(rotation='vertical')
             st.pyplot(fig)
 
-            # Activity map
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
 
+
+        # Activity map
+        try:
             st.title("Activity Map")
             col1, col2 = st.columns(2)
 
@@ -87,7 +96,12 @@ try:
             ax = sns.heatmap(user_heatmap)
             st.pyplot(fig)
 
-            # finding the busiest user in the group(Group Level)
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
+
+
+        # Most Busiest User(Group Level)
+        try:
             if selected_user == 'Overall':
                 st.title("Most Busiest User")
                 x, new_df = helper.most_busy_user(df)
@@ -103,12 +117,17 @@ try:
                     st.dataframe(new_df)
 
 
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
-            # Most Common Words
+
+        # Most Common Words
+        try:
             most_common_df = helper.most_common_words(selected_user, df)
             st.title("Most Common Words")
             if most_common_df.empty:
-                st.write("<span style='font-size: 24px'>🚫 Words are not present or irrelevant words in chat.</span>", unsafe_allow_html=True)
+                st.write("<span style='font-size: 24px'>🚫 Words are not present or irrelevant words in chat.</span>",
+                         unsafe_allow_html=True)
 
             else:
                 fig = go.Figure(data=go.Bar(
@@ -127,17 +146,12 @@ try:
 
                 st.plotly_chart(fig)
 
-            # WordCloud
-            st.title("WordCloud")
-            df_wc = helper.create_word_cloud(selected_user, df)
-            if df_wc is None:
-                st.write("<span style='font-size: 24px'>🚫 Word Cloud is not possible.</span>", unsafe_allow_html=True)
-            else:
-                fig, ax = plt.subplots()
-                ax.imshow(df_wc, interpolation='bilinear')
-                st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
-            # Emoji Analysis
+
+        # Emoji Analysis
+        try:
             emoji_df = helper.emoji_helper(selected_user, df)
             st.title("Emoji Analysis")
             if emoji_df.size == 0:
@@ -164,8 +178,12 @@ try:
                     st.write("Donut Chart of Top 5 Emoji")
                     st.plotly_chart(fig)
 
-            # Sentiment Analysis
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
+
+        # Sentiment Analysis
+        try:
             st.title("Sentiment Analysis")
             sentiment = helper.nlp_sentiment_analysis(selected_user, df)
 
@@ -181,7 +199,12 @@ try:
             plt.title("Sentiment Analysis of Messages as Classification", fontsize=18, fontweight='bold')
             st.pyplot(fig)
 
-            # Early Bird & Night Owl Detection
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+
+
+        # Early Bird & Night Owl Detection
+        try:
             st.title("Fun Facts")
 
             # Identify the person with the most messages sent during night hours
@@ -199,6 +222,7 @@ try:
                 st.subheader(f"{early_bird} is the early bird.")
                 st.subheader(f"{night_owl} is the night owl.")
 
-except Exception as e:
-    # Display an error message if an exception is raised
-    st.error(f"Error occured is: {e}")
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+
+            
