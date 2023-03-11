@@ -102,32 +102,41 @@ try:
                 with col2:
                     st.dataframe(new_df)
 
-            # WordCloud
-            st.title("WordCloud")
-            df_wc = helper.create_word_cloud(selected_user, df)
-            fig, ax = plt.subplots()
-            ax.imshow(df_wc, interpolation='bilinear')
-            st.pyplot(fig)
+
 
             # Most Common Words
             most_common_df = helper.most_common_words(selected_user, df)
+            st.title("Most Common Words")
+            if most_common_df.empty:
+                st.write("<span style='font-size: 24px'>🚫 Words are not present or irrelevant words in chat.</span>", unsafe_allow_html=True)
 
-            fig = go.Figure(data=go.Bar(
-                x=most_common_df[1],
-                y=most_common_df[0],
-                orientation='h',  # Set bars to be horizontal
-                text=most_common_df[1],  # Use word counts as data labels
-                textposition='inside',
-                insidetextanchor='middle',
-                marker=dict(color='mediumseagreen')
-            ))
-            fig.update_traces(textfont=dict(size=14, color='white'))
-            # Customize axis labels and tick values
-            fig.update_layout(xaxis_title='Value', yaxis_title='Category',
-                              xaxis=dict(tickmode='auto', tick0=0, dtick=5))
+            else:
+                fig = go.Figure(data=go.Bar(
+                    x=most_common_df[1],
+                    y=most_common_df[0],
+                    orientation='h',  # Set bars to be horizontal
+                    text=most_common_df[1],  # Use word counts as data labels
+                    textposition='inside',
+                    insidetextanchor='middle',
+                    marker=dict(color='mediumseagreen')
+                ))
+                fig.update_traces(textfont=dict(size=14, color='white'))
+                # Customize axis labels and tick values
+                fig.update_layout(xaxis_title='Value', yaxis_title='Category',
+                                  xaxis=dict(tickmode='auto', tick0=0, dtick=5))
 
-            st.title('Most Common Words')
-            st.plotly_chart(fig)
+                st.title('Most Common Words')
+                st.plotly_chart(fig)
+
+            # WordCloud
+            st.title("WordCloud")
+            df_wc = helper.create_word_cloud(selected_user, df)
+            if df_wc is None:
+                st.write("<span style='font-size: 24px'>🚫 Word Cloud is not possible.</span>", unsafe_allow_html=True)
+            else:
+                fig, ax = plt.subplots()
+                ax.imshow(df_wc, interpolation='bilinear')
+                st.pyplot(fig)
 
             # Emoji Analysis
             emoji_df = helper.emoji_helper(selected_user, df)
