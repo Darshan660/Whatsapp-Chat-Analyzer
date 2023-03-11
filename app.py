@@ -103,12 +103,17 @@ if uploaded_file is not None:
         try:
             st.title("WordCloud")
             df_wc = helper.create_word_cloud(selected_user, df)
-            fig, ax = plt.subplots()
-            ax.imshow(df_wc, interpolation='bilinear')
-            st.pyplot(fig)
+            if df_wc is None:
+                st.write("<span style='font-size: 24px'>🚫 Word Cloud is not possible.</span>",
+                         unsafe_allow_html=True)
+            else:
+                fig, ax = plt.subplots()
+                ax.imshow(df_wc, interpolation='bilinear')
+                st.pyplot(fig)
 
         except Exception as e:
             st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
+
 
         # Most Busiest User(Group Level)
         try:
