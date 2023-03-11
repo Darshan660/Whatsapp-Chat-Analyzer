@@ -99,6 +99,16 @@ if uploaded_file is not None:
         except Exception as e:
             st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
 
+        # WordCloud
+        try:
+            st.title("WordCloud")
+            df_wc = helper.create_word_cloud(selected_user, df)
+            fig, ax = plt.subplots()
+            ax.imshow(df_wc, interpolation='bilinear')
+            st.pyplot(fig)
+
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
 
         # Most Busiest User(Group Level)
         try:
@@ -224,5 +234,3 @@ if uploaded_file is not None:
 
         except Exception as e:
             st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
-
-            
