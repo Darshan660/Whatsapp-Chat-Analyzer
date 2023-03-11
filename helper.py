@@ -12,6 +12,15 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 extract = URLExtract()
 
+
+def clean_non_ascii_words(text):
+    words_list = []
+    # Remove non-ASCII characters
+    text = re.sub(r'[^\x00-\x7f]', r'', text)
+    words_list.append(text)
+    text = ' '.join(words_list)
+    return text
+
 def fetch_stats(selected_user,df):
 
     if selected_user!='Overall':
@@ -22,7 +31,8 @@ def fetch_stats(selected_user,df):
 
     # Fetch Total number of words
     words = []
-    for message in df['message']:
+    # Creating a function to remove emoji from the words
+    for message in df['message'].apply(clean_non_ascii_words):
         words.extend(message.split())
 
     # Fetch number of media messages
@@ -74,11 +84,14 @@ def create_word_cloud(selected_user,df):
         text = ' '.join(emoji_list)
         return text
 
-    wc = WordCloud(width=500,height=400,min_font_size=10,background_color='white')
-    temp['message'] = temp['message'].apply(remove_stop_words)
-    temp['message'] = temp['message'].apply(clean_non_ascii)
-    df_wc = wc.generate(temp['message'].str.cat(sep=" "))
-    return df_wc
+    if temp.size==0:
+        return None
+    else:
+        wc = WordCloud(width=500, height=400, min_font_size=10, background_color='white')
+        temp['message'] = temp['message'].apply(remove_stop_words)
+        temp['message'] = temp['message'].apply(clean_non_ascii)
+        df_wc = wc.generate(temp['message'].str.cat(sep=" "))
+        return df_wc
 
 def most_common_words(selected_user,df):
 
@@ -92,13 +105,16 @@ def most_common_words(selected_user,df):
     temp = temp[temp['message'] != '<Media omitted>\n']
 
     words = []
-    for message in temp['message']:
+    for message in temp['message'].apply(clean_non_ascii_words):
         for word in message.lower().split():
             if word not in stop_words:
                 words.append(word)
-
-    most_common_df = pd.DataFrame(Counter(words).most_common(5))
-    return most_common_df
+    if len(words)==0:
+        most_common_df = pd.DataFrame()
+        return most_common_df
+    else:
+        most_common_df = pd.DataFrame(Counter(words).most_common(5))
+        return most_common_df
 
 def emoji_helper(selected_user,df):
 
@@ -109,26 +125,31 @@ def emoji_helper(selected_user,df):
     for message in df['message']:
         emojis.extend([c for c in message if c in emoji.UNICODE_EMOJI['en']])
 
-    emoji_df = pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))))
+    # If there are no emojis used
+    if len(emojis) == 0:
+        emoji_df = pd.DataFrame() # create empty DataFrame
+        return emoji_df
+    else:
+        emoji_df = pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))))
 
-    # Rearranging index
-    emoji_df.index = np.arange(1, len(emoji_df) + 1)
-    # Renaming Columns
-    emoji_df.rename(columns={0: 'Emojis', 1: 'Count'},inplace=True)
+        # Rearranging index
+        emoji_df.index = np.arange(1, len(emoji_df) + 1)
+        # Renaming Columns
+        emoji_df.rename(columns={0: 'Emojis', 1: 'Count'}, inplace=True)
 
-    # Demojizing the emoji
-    emoji_list = []
-    for i in emoji_df['Emojis']:
-        a = emoji.demojize(i)
-        emoji_list.append(a)
-    emoji_df['sentiments'] = emoji_list
+        # Demojizing the emoji
+        emoji_list = []
+        for i in emoji_df['Emojis']:
+            a = emoji.demojize(i)
+            emoji_list.append(a)
+        emoji_df['sentiments'] = emoji_list
 
-    # Replacing the [:,_] from the sentiments
-    chars_to_remove = [':', '_']
-    for char in chars_to_remove:
-        emoji_df['sentiments'] = emoji_df['sentiments'].str.replace(char, ' ')
+        # Replacing the [:,_] from the sentiments
+        chars_to_remove = [':', '_']
+        for char in chars_to_remove:
+            emoji_df['sentiments'] = emoji_df['sentiments'].str.replace(char, ' ')
 
-    return emoji_df
+        return emoji_df
 
 def monthly_timeline(selected_user,df):
 
