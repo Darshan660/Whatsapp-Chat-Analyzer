@@ -6,101 +6,117 @@ import plotly.graph_objs as go
 
 st.sidebar.title("Whatsapp Chat Analyzer")
 
-try:
-    uploaded_file = st.sidebar.file_uploader("Choose a file")
-    if uploaded_file is not None:
-        bytes_data = uploaded_file.getvalue()
-        data = bytes_data.decode("utf-8")
-        df = preprocessor.preprocess(data)
+uploaded_file = st.sidebar.file_uploader("Choose a file",type="txt")
+if uploaded_file is not None:
+    bytes_data = uploaded_file.getvalue()
+    data = bytes_data.decode("utf-8")
+    df = preprocessor.preprocess(data)
 
-        # Fetching unique user
-        user_list = df['user'].unique().tolist()
+    # Fetching unique user
+    user_list = df['user'].unique().tolist()
 
-        if 'group_notification' in user_list:
-            user_list.remove('group_notification')
-        user_list.sort()
-        user_list.insert(0, "Overall")
-        selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
+    if 'group_notification' in user_list:
+        user_list.remove('group_notification')
+    user_list.sort()
+    user_list.insert(0, "Overall")
+    selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
 
-        if st.sidebar.button("Show Analysis"):
-            # Stats Area
-            try:
-                num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
+    if st.sidebar.button("Show Analysis"):
+        # Stats Area
+        try:
+            num_messages, words, num_media_messages, num_links = helper.fetch_stats(selected_user, df)
 
-                st.title("Top Satistics")
-                col1, col2, col3, col4 = st.columns(4)
+            st.title("Top Satistics")
+            col1, col2, col3, col4 = st.columns(4)
 
-                with col1:
-                    st.header("Total Messages")
-                    st.title(num_messages)
-                with col2:
-                    st.header("Total Words")
-                    st.title(words)
-                with col3:
-                    st.header("Media Shared")
-                    st.title(num_media_messages)
-                with col4:
-                    st.header("Links Shared")
-                    st.title(num_links)
+            with col1:
+                st.header("Total Messages")
+                st.title(num_messages)
+            with col2:
+                st.header("Total Words")
+                st.title(words)
+            with col3:
+                st.header("Media Shared")
+                st.title(num_media_messages)
+            with col4:
+                st.header("Links Shared")
+                st.title(num_links)
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
 
-            # Monthly Timeline
-            try:
-                st.title("Monthly Timeline")
-                timeline = helper.monthly_timeline(selected_user, df)
-                fig, ax = plt.subplots()
-                ax.plot(timeline['time'], timeline['message'], color='green', marker=".")
-                plt.xticks(rotation='vertical')
-                st.pyplot(fig)
 
-                # Daily Timeline
-                st.title("Daily Timeline")
-                daily_timeline = helper.daily_timeline(selected_user, df)
-                fig, ax = plt.subplots()
-                ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='green', marker=".")
-                plt.xticks(rotation='vertical')
-                st.pyplot(fig)
+        # Monthly Timeline
+        try:
+            st.title("Monthly Timeline")
+            timeline = helper.monthly_timeline(selected_user, df)
+            fig, ax = plt.subplots()
+            ax.plot(timeline['time'], timeline['message'], color='green', marker=".")
+            plt.xticks(rotation='vertical')
+            st.pyplot(fig)
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+            # Daily Timeline
+            st.title("Daily Timeline")
+            daily_timeline = helper.daily_timeline(selected_user, df)
+            fig, ax = plt.subplots()
+            ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='green', marker=".")
+            plt.xticks(rotation='vertical')
+            st.pyplot(fig)
 
-            # Activity map
-            try:
-                st.title("Activity Map")
-                col1, col2 = st.columns(2)
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
 
-                with col1:
-                    st.header("Most Busy Day")
+
+        # Activity map
+        try:
+            st.title("Activity Map")
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.header("Most Busy Day")
+                result_placeholder = st.empty()  # Create a placeholder element to display the result
+                with st.spinner('Running...'):  # Display a spinner
+                    # Code of most busy day
                     busy_day = helper.week_activity_map(selected_user, df)
                     fig, ax = plt.subplots()
                     ax.bar(busy_day.index, busy_day.values, color='c')
                     plt.xticks(rotation='vertical')
                     helper.addlabels(busy_day.index, busy_day.values)  # To add data labels on bar graph
                     st.pyplot(fig)
+                result_placeholder.write()  # Update the placeholder element with the result
 
-                with col2:
-                    st.header("Most Busy Month")
+            with col2:
+                st.header("Most Busy Month")
+                result_placeholder = st.empty()  # Create a placeholder element to display the result
+                with st.spinner('Running...'):  # Display a spinner
+                    # Code of most busy month
                     busy_month = helper.month_activity_map(selected_user, df)
                     fig, ax = plt.subplots()
                     ax.bar(busy_month.index, busy_month.values, color='#c20078')
                     plt.xticks(rotation='vertical')
                     helper.addlabels(busy_month.index, busy_month.values)  # To add data labels on bar graph
                     st.pyplot(fig)
+                result_placeholder.write()  # Update the placeholder element with the result
 
-                st.title("Weekly Activity Map")
+            st.title("Weekly Activity Map")
+            result_placeholder = st.empty()  # Create a placeholder element to display the result
+            with st.spinner('Running...'):  # Display a spinner
+                # Code of heatmap
                 user_heatmap = helper.activity_heatmap(selected_user, df)
                 fig, ax = plt.subplots()
                 ax = sns.heatmap(user_heatmap)
                 st.pyplot(fig)
+            result_placeholder.write()  # Update the placeholder element with the result
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
 
-            # WordCloud
-            try:
-                st.title("WordCloud")
+        # WordCloud
+        try:
+            st.title("WordCloud")
+            result_placeholder = st.empty() # Create a placeholder element to display the result
+            with st.spinner('Running...'):# Display a spinner to indicate that the function is running
+                # Code of wordcloud
                 df_wc = helper.create_word_cloud(selected_user, df)
                 if df_wc is None:
                     st.write("<span style='font-size: 24px'>🚫 Word Cloud is not possible.</span>",
@@ -110,13 +126,20 @@ try:
                     ax.imshow(df_wc, interpolation='bilinear')
                     st.pyplot(fig)
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+            result_placeholder.write()  # Update the placeholder element with the result
 
-            # Most Busiest User(Group Level)
-            try:
-                if selected_user == 'Overall':
-                    st.title("Most Busiest User")
+
+        except Exception as e:
+            st.error(f"Error occured is: {e}") # Display an error message if an exception is raised
+
+
+        # Most Busiest User(Group Level)
+        try:
+            if selected_user == 'Overall':
+                st.title("Most Busiest User")
+                result_placeholder = st.empty()  # Create a placeholder element to display the result
+                with st.spinner('Running...'):  # Display a spinner
+                    # Code of Most busiest user
                     x, new_df = helper.most_busy_user(df)
                     fig, ax = plt.subplots()
 
@@ -126,17 +149,22 @@ try:
                         ax.bar(x.index, x.values, color='red')
                         plt.xticks(rotation='vertical')
                         st.pyplot(fig)
+
                     with col2:
                         st.dataframe(new_df)
+                    result_placeholder.write()  # Update the placeholder element with the result
+
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
-
-            # Most Common Words
-            try:
+        # Most Common Words
+        try:
+            st.title("Most Common Words")
+            result_placeholder = st.empty()  # Create a placeholder element to display the result
+            with st.spinner('Running...'):  # Display a spinner
+                # Code of most common words
                 most_common_df = helper.most_common_words(selected_user, df)
-                st.title("Most Common Words")
                 if most_common_df.empty:
                     st.write(
                         "<span style='font-size: 24px'>🚫 Words are not present or irrelevant words in chat.</span>",
@@ -158,12 +186,17 @@ try:
                                       xaxis=dict(tickmode='auto', tick0=0, dtick=5))
 
                     st.plotly_chart(fig)
+                    result_placeholder.write()  # Update the placeholder element with the result
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
-            # Emoji Analysis
-            try:
+
+        # Emoji Analysis
+        try:
+            result_placeholder = st.empty()  # Create a placeholder element to display the result
+            with st.spinner('Running...'):  # Display a spinner
+                # Code of emoji analysis
                 emoji_df = helper.emoji_helper(selected_user, df)
                 st.title("Emoji Analysis")
                 if emoji_df.size == 0:
@@ -189,13 +222,18 @@ try:
 
                         st.write("Donut Chart of Top 5 Emoji")
                         st.plotly_chart(fig)
+                        result_placeholder.write()  # Update the placeholder element with the result
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
-            # Sentiment Analysis
-            try:
-                st.title("Sentiment Analysis")
+
+        # Sentiment Analysis
+        try:
+            st.title("Sentiment Analysis")
+            result_placeholder = st.empty()  # Create a placeholder element to display the result
+            with st.spinner('Running...'):  # Display a spinner
+                # Code of sentiment analysis
                 sentiment = helper.nlp_sentiment_analysis(selected_user, df)
 
                 fig, ax = plt.subplots()
@@ -209,31 +247,30 @@ try:
                 plt.ylabel("Number of Messages", fontsize=14)
                 plt.title("Sentiment Analysis of Messages as Classification", fontsize=18, fontweight='bold')
                 st.pyplot(fig)
+                result_placeholder.write()  # Update the placeholder element with the result
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
-            # Early Bird & Night Owl Detection
-            try:
-                st.title("Fun Facts")
 
-                # Identify the person with the most messages sent during night hours
-                night_owl = df[(df['hour'] >= 0) & (df['hour'] < 5)].groupby('user').size().idxmax()
+        # Early Bird & Night Owl Detection
+        try:
+            st.title("Fun Facts")
 
-                # Identify the person with the most messages sent during early morning hours
-                early_bird = df[(df['hour'] >= 5) & (df['hour'] < 9)].groupby('user').size().idxmax()
+            # Identify the person with the most messages sent during night hours
+            night_owl = df[(df['hour'] >= 0) & (df['hour'] < 5)].groupby('user').size().idxmax()
 
-                # To display message differently in a group and personal chat
-                unique_user = df['user'].unique()
-                if len(unique_user) > 3:  # For Group Chat
-                    st.subheader(f"{early_bird} is the early bird in the group.")
-                    st.subheader(f"{night_owl} is the night owl in the group.")
-                else:  # For Personal Chat
-                    st.subheader(f"{early_bird} is the early bird.")
-                    st.subheader(f"{night_owl} is the night owl.")
+            # Identify the person with the most messages sent during early morning hours
+            early_bird = df[(df['hour'] >= 5) & (df['hour'] < 9)].groupby('user').size().idxmax()
 
-            except Exception as e:
-                st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
+            # To display message differently in a group and personal chat
+            unique_user = df['user'].unique()
+            if len(unique_user) > 3:  # For Group Chat
+                st.subheader(f"{early_bird} is the early bird in the group.")
+                st.subheader(f"{night_owl} is the night owl in the group.")
+            else:  # For Personal Chat
+                st.subheader(f"{early_bird} is the early bird.")
+                st.subheader(f"{night_owl} is the night owl.")
 
-except Exception as e:
-    st.error(f"File not supported!  {e}")  # Display an error message if an exception is raised
+        except Exception as e:
+            st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
