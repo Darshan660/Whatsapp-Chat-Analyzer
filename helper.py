@@ -20,17 +20,6 @@ def clean_non_ascii_words(text):
     text = ' '.join(words_list)
     return text
 
-def clean_links(text):
-    # Remove Google Drive links
-    text = re.sub(r'https?://drive.google.com/\S+', '', text)
-
-    # Remove other URLs from chat message
-    extractor = URLExtract()  # Create URLExtract object
-    urls = extractor.find_urls(text)  # Extract URLs from chat message
-    for url in urls:
-        text = text.replace(url, '')
-    return text
-
 def fetch_stats(selected_user,df):
 
     if selected_user!='Overall':
@@ -40,11 +29,24 @@ def fetch_stats(selected_user,df):
     num_messages = df.shape[0]
 
     # Fetch Total number of words
+    def clean_links(text):
+        # Remove other URLs from chat message
+        regex_pattern = r'(http|https)://[^\s]*'
+        urls = re.findall(regex_pattern, text)
+        for url in urls:
+            text = text.replace(url, '')
+        return text
+
+    def clean_drive_links(text):
+        # Remove Google Drive links
+        text = re.sub(r'https?://drive.google.com/\S+', '', text)
+        return text
     words = []
+    df['message'] = df['message'].apply(clean_drive_links)  # To exclude any drive links
+    df['message'] = df['message'].apply(clean_links)  # To exclude any links
+
     # Creating a function to remove emoji from the words
-    df['message'] = df['message'].apply(clean_links) # To exclude any links
-    df['message'] = df['message'].apply(clean_non_ascii_words) # To exclude any punctuation
-    for message in df['message']:
+    for message in df['message'].apply(clean_non_ascii_words):
         words.extend(message.split())
 
     # Fetch number of media messages
@@ -53,8 +55,8 @@ def fetch_stats(selected_user,df):
     # Fetch number of links shared
     links = []
     for message in df['message']:
-        links.extend(extract.find_urls(message))
-
+        links.extend(extract.find_urls(message)) # To get URL links
+        links.extend(re.sub(r'https?://drive.google.com/\S+', '', message)) # To get drive links
     return num_messages, len(words),num_media_messages,len(links)
 
 def most_busy_user(df):
@@ -65,7 +67,6 @@ def most_busy_user(df):
     # Rearranging Index
     df.index = np.arange(1, len(df) + 1)
     return x,df
-
 
 def create_word_cloud(selected_user, df):
     f = open('stop_hinglish.txt', 'r')
@@ -84,6 +85,19 @@ def create_word_cloud(selected_user, df):
     temp = temp.loc[~temp['message'].str.contains(
         'deleted this message')]  # Excluding the messages deleted by other members in the group
 
+    def clean_links(text):
+        # Remove other URLs from chat message
+        regex_pattern = r'(http|https)://[^\s]*'
+        urls = re.findall(regex_pattern, text)
+        for url in urls:
+            text = text.replace(url, '')
+        return text
+
+    def clean_drive_links(text):
+        # Remove Google Drive links
+        text = re.sub(r'https?://drive.google.com/\S+', '', text)
+        return text
+
     def remove_stop_words(message):
         y = []
         for word in message.lower().split():
@@ -92,6 +106,7 @@ def create_word_cloud(selected_user, df):
         return " ".join(y)
 
     # Clean links and stop words from messages and leave the message empty(while in whole row other data is present)
+    temp['message'] = temp['message'].apply(clean_drive_links)
     temp['message'] = temp['message'].apply(clean_links)
     temp['message'] = temp['message'].apply(remove_stop_words)
     temp['message'] = temp['message'].apply(clean_non_ascii_words)
@@ -106,7 +121,6 @@ def create_word_cloud(selected_user, df):
         df_wc = wc.generate(temp['message'].str.cat(sep=" "))
         return df_wc
 
-
 def most_common_words(selected_user,df):
 
     def clean_punctuations(text):
@@ -120,13 +134,27 @@ def most_common_words(selected_user,df):
     if selected_user!='Overall':
         df = df[df['user'] == selected_user]
 
+    def clean_links(text):
+        # Remove other URLs from chat message
+        regex_pattern = r'(http|https)://[^\s]*'
+        urls = re.findall(regex_pattern, text)
+        for url in urls:
+            text = text.replace(url, '')
+        return text
+
+    def clean_drive_links(text):
+        # Remove Google Drive links
+        text = re.sub(r'https?://drive.google.com/\S+', '', text)
+        return text
+
     temp = df[df['user'] != 'group_notification']
     temp = temp[temp['message'] != '<Media omitted>\n']
-    temp = temp.loc[~temp['message'].str.contains('Missed voice call')] # Excluding voice call notification
-    temp = temp.loc[~temp['message'].str.contains('Missed video call')] # Excluding video call notification
     temp = temp.loc[~temp['message'].str.contains('This message was deleted')]  # Excluding the messages deleted by the user itslef
     temp = temp.loc[~temp['message'].str.contains('deleted this message')]  # Excluding the messages deleted by other members in the group
-    temp['message'] = temp['message'].apply(clean_links)  # To exclude links
+    temp = temp.loc[~temp['message'].str.contains('Missed voice call')]  # Excluding voice call notification
+    temp = temp.loc[~temp['message'].str.contains('Missed video call')]  # Excluding video call notification
+    temp['message'] = temp['message'].apply(clean_drive_links)  # To exclude drive links
+    temp['message'] = temp['message'].apply(clean_links)  # To exclude url links
     temp['message'] = temp['message'].apply(clean_punctuations)  # To exclude punctuations
 
     words = []
@@ -246,18 +274,18 @@ def nlp_sentiment_analysis(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
     sentiment = []
-    analyzer = SentimentIntensityAnalyzer()
-    for message in df["message"]:
-        scores = analyzer.polarity_scores(message)
-        if scores['compound'] > 0.2:
-            sentiment.append("very positive")
-        elif scores['compound'] > 0:
-            sentiment.append("positive")
-        elif scores['compound'] < -0.2:
-            sentiment.append("very negative")
-        elif scores['compound'] < 0:
-            sentiment.append("negative")
+    sid = SentimentIntensityAnalyzer()
+    for message in df['message']:
+        score = sid.polarity_scores(message)['compound']
+        if score >= 0.9:
+            sentiment.append('very positive')
+        elif score >= 0.1 and score < 0.9:
+            sentiment.append('positive')
+        elif score > -0.1 and score < 0.1:
+            sentiment.append('neutral')
+        elif score > -0.9 and score <= -0.1:
+            sentiment.append('negative')
         else:
-            sentiment.append("neutral")
-    df["sentiment"] = sentiment
-    return df["sentiment"].value_counts()
+            sentiment.append('very negative')
+    df['sentiment'] = sentiment
+    return df['sentiment'].value_counts()
