@@ -3,8 +3,21 @@ import preprocessor,helper
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.graph_objs as go
+import base64
 
-st.sidebar.title("Whatsapp Chat Analyzer")
+st.sidebar.markdown("<span style='font-size: 26px; font-weight: bold;'><u>WhatsApp Chat Analyzer</u></span>", unsafe_allow_html=True)
+
+def download_file():
+    with open('test.txt', 'r', encoding='utf-8') as f:
+        contents = f.read()
+    b64 = base64.b64encode(contents.encode()).decode()
+    href = f'<a href="data:file/txt;base64,{b64}" download="test.txt">Download file</a>'
+    st.sidebar.markdown(href, unsafe_allow_html=True)
+
+# Add download button to sidebar
+st.sidebar.caption("Click on the Download button to download the test file to Analyze Whatsapp Chats (If you don't have any)")
+if st.sidebar.button('Download File'):
+    download_file()
 
 uploaded_file = st.sidebar.file_uploader("Choose a file",type="txt")
 if uploaded_file is not None:
