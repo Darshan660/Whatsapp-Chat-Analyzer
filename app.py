@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.graph_objs as go
 import base64
+import numpy as np
 
 st.sidebar.markdown("<span style='font-size: 26px; font-weight: bold;'><u>WhatsApp Chat Analyzer</u></span>", unsafe_allow_html=True)
 
@@ -65,7 +66,12 @@ if uploaded_file is not None:
             timeline = helper.monthly_timeline(selected_user, df)
             fig, ax = plt.subplots()
             ax.plot(timeline['time'], timeline['message'], color='green', marker=".")
-            plt.xticks(rotation='vertical')
+            # Will create interval only if the data is above 30
+            if len(timeline['time']) > 30:
+                x_ticks = np.arange(0, len(timeline['time']), 2)  # set interval to 7 days
+                plt.xticks(x_ticks, timeline['time'][x_ticks], rotation='vertical')
+            else:
+                plt.xticks(rotation='vertical')
             st.pyplot(fig)
 
             # Daily Timeline
