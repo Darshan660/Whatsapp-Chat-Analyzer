@@ -28,6 +28,12 @@ def fetch_stats(selected_user,df):
     # Fetching number of messages
     num_messages = df.shape[0]
 
+    # Fetch number of links shared
+    links = []
+    for message in df['message']:
+        links.extend(extract.find_urls(message))  # To get URL links
+        links.extend(re.findall(r'https?://(?:www\.)?(?:drive|docs)\.google\.(?:com|co\.[a-z]{2,3})/\S+', message))  # To get drive links
+    len_links = len(links)
     # Fetch Total number of words
     def clean_links(text):
         # Remove other URLs from chat message
@@ -60,12 +66,7 @@ def fetch_stats(selected_user,df):
     # Fetch number of media messages
     num_media_messages = df[df['message'] == '<Media omitted>\n'].shape[0]
 
-    # Fetch number of links shared
-    links = []
-    for message in df['message']:
-        links.extend(extract.find_urls(message)) # To get URL links
-        links.extend(re.sub(r'https?://drive.google.com/\S+', '', message)) # To get drive links
-    return num_messages, len(words),num_media_messages,len(links)
+    return num_messages, len(words),num_media_messages,len_links
 
 def most_busy_user(df):
     x = df['user'].value_counts().head()
