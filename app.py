@@ -271,19 +271,29 @@ if uploaded_file is not None:
             st.title("Fun Facts")
 
             # Identify the person with the most messages sent during night hours
-            night_owl = df[(df['hour'] >= 0) & (df['hour'] < 5)].groupby('user').size().idxmax()
+            night_owl_group = df[(df['hour'] >= 0) & (df['hour'] < 5)].groupby('user').size()
+
+            if night_owl_group.empty:
+                night_owl = "No one"
+            else:
+                night_owl = night_owl_group.idxmax()
 
             # Identify the person with the most messages sent during early morning hours
-            early_bird = df[(df['hour'] >= 5) & (df['hour'] < 9)].groupby('user').size().idxmax()
+            early_bird_group = df[(df['hour'] >= 5) & (df['hour'] < 9)].groupby('user').size()
+
+            if early_bird_group.empty:
+                early_bird = "No one"
+            else:
+                early_bird = early_bird_group.idxmax()
 
             # To display message differently in a group and personal chat
             unique_user = df['user'].unique()
             if len(unique_user) > 3:  # For Group Chat
-                st.subheader(f"{early_bird} is the early bird in the group.")
-                st.subheader(f"{night_owl} is the night owl in the group.")
+                st.write(f"<span style='font-size: 28px'><u><b>{early_bird}</u> is the early bird in the group.</b></span>", unsafe_allow_html=True)
+                st.write(f"<span style='font-size: 28px'><u><b>{night_owl}</u> is the night owl in the group.</b></span>", unsafe_allow_html=True)
             else:  # For Personal Chat
-                st.subheader(f"{early_bird} is the early bird.")
-                st.subheader(f"{night_owl} is the night owl.")
+                st.write(f"<span style='font-size: 28px'><u><b>{early_bird}</u> is the early bird.</b></span>", unsafe_allow_html=True)
+                st.write(f"<span style='font-size: 28px'><u><b>{night_owl}</u> is the night owl.</b></span>", unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
