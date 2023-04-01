@@ -41,12 +41,20 @@ def fetch_stats(selected_user,df):
         # Remove Google Drive links
         text = re.sub(r'https?://drive.google.com/\S+', '', text)
         return text
+
+    def clean_punctuations_and_numbers(text):
+        # use regular expression to exclude punctuations and also numbers
+        text = re.sub(r'[^\w\s]|[\d]', '', text)
+        return text
+
     words = []
-    df['message'] = df['message'].apply(clean_drive_links)  # To exclude any drive links
-    df['message'] = df['message'].apply(clean_links)  # To exclude any links
+    temp = df['message']
+    temp = temp.apply(clean_drive_links)  # To exclude any drive links
+    temp = temp.apply(clean_links)  # To exclude any links
+    temp = temp.apply(clean_punctuations_and_numbers)
 
     # Creating a function to remove emoji from the words
-    for message in df['message'].apply(clean_non_ascii_words):
+    for message in temp.apply(clean_non_ascii_words):
         words.extend(message.split())
 
     # Fetch number of media messages
@@ -123,9 +131,9 @@ def create_word_cloud(selected_user, df):
 
 def most_common_words(selected_user,df):
 
-    def clean_punctuations(text):
-        # use regular expression to exclude punctuations
-        text = re.sub(r'[^\w\s]', '', text)
+    def clean_punctuations_and_numbers(text):
+        # use regular expression to exclude punctuations and also numbers
+        text = re.sub(r'[^\w\s]|[\d]', '', text)
         return text
 
     f = open('stop_hinglish.txt','r')
@@ -155,7 +163,7 @@ def most_common_words(selected_user,df):
     temp = temp.loc[~temp['message'].str.contains('Missed video call')]  # Excluding video call notification
     temp['message'] = temp['message'].apply(clean_drive_links)  # To exclude drive links
     temp['message'] = temp['message'].apply(clean_links)  # To exclude url links
-    temp['message'] = temp['message'].apply(clean_punctuations)  # To exclude punctuations
+    temp['message'] = temp['message'].apply(clean_punctuations_and_numbers)  # To exclude punctuations
 
     words = []
     for message in temp['message'].apply(clean_non_ascii_words):
