@@ -4,6 +4,7 @@ nltk==3.8.1
 numpy==1.21.6
 pandas==1.1.5
 plotly==5.13.0
+python_dateutil==2.8.2
 seaborn==0.12.2
 streamlit==1.18.1
 urlextract==1.8.0
