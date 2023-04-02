@@ -20,12 +20,21 @@ def clean_non_ascii_words(text):
     text = ' '.join(words_list)
     return text
 
+def clean_non_english_words(text):
+    # Remove non-ASCII characters
+    text = re.sub(r'[^\x00-\x7f]', r' ', text)
+    # Remove non-English characters
+    english_chars = re.compile(r'[A-Za-z]+')
+    text = ' '.join(english_chars.findall(text))
+    return text
+
 def fetch_stats(selected_user,df):
 
     if selected_user!='Overall':
         df = df[df['user'] == selected_user]
 
     # Fetching number of messages
+    pd.set_option('display.max_rows', None)
     num_messages = df.shape[0]
 
     # Fetch number of links shared
@@ -119,11 +128,12 @@ def create_word_cloud(selected_user, df):
     temp['message'] = temp['message'].apply(clean_links)
     temp['message'] = temp['message'].apply(remove_stop_words)
     temp['message'] = temp['message'].apply(clean_non_ascii_words)
+    temp['message'] = temp['message'].apply(clean_non_english_words)
 
     # Exclude empty messages
     temp = temp[temp['message'].str.len() > 0]
 
-    if temp.size == 0:
+    if temp.empty or temp.size==0:
         return None
     else:
         wc = WordCloud(width=500, height=400, min_font_size=10, background_color='white')
