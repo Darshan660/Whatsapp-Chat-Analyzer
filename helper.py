@@ -136,7 +136,7 @@ def create_word_cloud(selected_user, df):
     if temp.empty or temp.size==0:
         return None
     else:
-        wc = WordCloud(width=500, height=400, min_font_size=10)
+        wc = WordCloud(width=500, height=400, min_font_size=10,background="black")
         df_wc = wc.generate(temp['message'].str.cat(sep=" "))
         return df_wc
 
