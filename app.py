@@ -5,6 +5,21 @@ import seaborn as sns
 import plotly.graph_objs as go
 import base64
 import numpy as np
+from pathlib import Path
+import sys
+
+# --- PATH SETTINGS ---
+current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+css_file = current_dir / "styles" / "main.css"
+
+# --- GENERAL SETTINGS ---
+PAGE_TITLE = "WhatsApp Chat Analyzer"
+PAGE_ICON = ":mag_right:"
+st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON)
+
+# --- LOAD CSS---
+with open(css_file) as f:
+    st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
 
 st.sidebar.markdown("<span style='font-size: 26px; font-weight: bold;'><u>WhatsApp Chat Analyzer</u></span>", unsafe_allow_html=True)
@@ -27,14 +42,20 @@ if uploaded_file is not None:
     data = bytes_data.decode("utf-8")
     df = preprocessor.preprocess(data)
 
-    # Fetching unique user
-    user_list = df['user'].unique().tolist()
+    try:
+        # Fetching unique user
+        user_list = df['user'].unique().tolist()
+    except Exception as e:
+        sys.exit(1)
 
-    if 'group_notification' in user_list:
-        user_list.remove('group_notification')
-    user_list.sort()
-    user_list.insert(0, "Overall")
-    selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
+    try:
+        if 'group_notification' in user_list:
+            user_list.remove('group_notification')
+        user_list.sort()
+        user_list.insert(0, "Overall")
+        selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
+    except Exception as e:
+        sys.exit(1)
 
     if st.sidebar.button("Show Analysis"):
         with st.spinner("Running analysis..."): # show spinner while analysis is running
