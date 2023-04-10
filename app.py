@@ -6,7 +6,6 @@ import plotly.graph_objs as go
 import base64
 import numpy as np
 from pathlib import Path
-import sys
 
 # --- PATH SETTINGS ---
 current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
@@ -46,7 +45,7 @@ if uploaded_file is not None:
         # Fetching unique user
         user_list = df['user'].unique().tolist()
     except Exception as e:
-        sys.exit(1)
+        st.stop()
 
     try:
         if 'group_notification' in user_list:
@@ -55,7 +54,7 @@ if uploaded_file is not None:
         user_list.insert(0, "Overall")
         selected_user = st.sidebar.selectbox("Show Analysis wrt", user_list)
     except Exception as e:
-        sys.exit(1)
+        st.stop()
 
     if st.sidebar.button("Show Analysis"):
         with st.spinner("Running analysis..."): # show spinner while analysis is running
