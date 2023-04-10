@@ -8,7 +8,7 @@ def preprocess(data):
 
     dates = re.findall(pattern, data)
     df = pd.DataFrame({'user_message': message, 'message_date': dates})
-    df['message_date'] = df['message_date'].str.rstrip(' -').apply(parser.parse)
+    df['message_date'] = df['message_date'].str.rstrip(' - ').apply(parser.parse)
     df.rename(columns={'message_date': 'date'}, inplace=True)
 
     users = []
