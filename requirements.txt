@@ -7,7 +7,6 @@ plotly==5.13.0
 python_dateutil==2.8.2
 seaborn==0.12.2
 streamlit==1.18.1
-streamlit-extras==0.0.1
 urlextract==1.8.0
 wordcloud==1.8.2.2
 streamlit_echarts==0.4.0
