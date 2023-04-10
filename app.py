@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import preprocessor,helper
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -244,7 +245,7 @@ if uploaded_file is not None:
 
                         with col1:
                             st.write("Count Table")
-                            st.dataframe(emoji_df)
+                            components.dataframe_explorer(emoji_df)
                         with col2:
                             fig, ax = plt.subplots()
 
