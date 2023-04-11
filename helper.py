@@ -247,7 +247,7 @@ def daily_timeline(selected_user,df):
     
     time = []
     for i in range(daily_timeline.shape[0]):
-        time.append(daily_timeline['month'][i] + "-" + str(timeline['day'][i]))
+        time.append(daily_timeline['month'][i] + "-" + str(daily_timeline['day'][i]))
 
     return daily_timeline
 
