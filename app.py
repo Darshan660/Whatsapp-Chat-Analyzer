@@ -7,6 +7,7 @@ import plotly.graph_objs as go
 import base64
 import numpy as np
 from pathlib import Path
+from streamlit_echarts import st_echarts
 
 # --- PATH SETTINGS ---
 current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
@@ -86,33 +87,37 @@ if uploaded_file is not None:
             try:
                 st.title("Monthly Timeline")
                 timeline = helper.monthly_timeline(selected_user, df)
-                fig, ax = plt.subplots()
-                ax.plot(timeline['time'], timeline['message'], color='green', marker=".")
-                # Will create interval only if the data is above 30
-                if len(timeline['time']) > 30:
-                    x_ticks = np.arange(0, len(timeline['time']), 2)  # set interval to 2 days
-                    plt.xticks(x_ticks, timeline['time'][x_ticks], rotation='vertical')
-                else:
-                    plt.xticks(rotation='vertical')
-                st.pyplot(fig)
+                # Plot the line chart using `st_echarts`
+                options = {
+                    'xAxis': {'type': 'category', 'data': timeline['time'].tolist(), 'axisLabel': {'rotate': 90}},
+                    'yAxis': {'type': 'value'},
+                    'series': [{'type': 'line', 'data': timeline['message'].tolist()}],
+                    'tooltip': {'trigger': 'axis'},
+                }
+                chart_height = 500
+                chart = st_echarts(options=options, height=chart_height)
 
                 # Daily Timeline
                 st.title("Daily Timeline")
                 daily_timeline = helper.daily_timeline(selected_user, df)
-                fig, ax = plt.subplots()
-                ax.plot(daily_timeline['time'], daily_timeline['message'], color='green', marker=".")
-                # Will create interval only if the data is above 30
-                if len(daily_timeline['time']) >=100:
-                    x_ticks = np.arange(0, len(daily_timeline['time']), 16)  # set interval to 16 days
-                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
-                elif len(daily_timeline['time']) <100 and len(daily_timeline['time']) >=35:
-                    x_ticks = np.arange(0, len(daily_timeline['time']), 2)  # set interval to 2 days
-                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
-                else:
-                    plt.xticks(rotation='vertical')
-                st.pyplot(fig)
-                
+                # Convert 'only_date' column to datetime-like data type
+                daily_timeline['only_date'] = pd.to_datetime(daily_timeline['only_date'])
+                # Drop rows with null or missing values in 'only_date' column
+                daily_timeline.dropna(subset=['only_date'], inplace=True)
+                # Convert 'date' objects to string representations with a specific format
+                daily_timeline['only_date'] = daily_timeline['only_date'].dt.strftime('%Y-%m-%d')
 
+                # Define the chart options
+                chart_options = {
+                    'xAxis': {'type': 'category', 'data': daily_timeline['only_date'].tolist(),
+                              'axisLabel': {'rotate': 90}},
+                    'yAxis': {'type': 'value'},
+                    'series': [{'type': 'line', 'data': daily_timeline['message'].tolist()}],
+                    'tooltip': {'trigger': 'axis'}
+                }
+                # Render the chart using streamlit-echarts
+                st_echarts(options=chart_options, height=500)
+                
             except Exception as e:
                 st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
 
