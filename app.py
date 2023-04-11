@@ -103,7 +103,8 @@ if uploaded_file is not None:
                 fig, ax = plt.subplots()
                 ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='green', marker=".")
                 ax.set_xticks(daily_timeline['only_date'])  # Set the x-ticks to the original only_date values
-                ax.set_xticklabels(daily_timeline['only_date_str'], rotation='vertical')  # Set the x-tick labels to the formatted string
+                ax.set_xticklabels(daily_timeline['only_date_str'], rotation=45, ha='right', fontsize=8)  # Adjust the rotation angle, alignment, and fontsize of x-tick labels
+                plt.subplots_adjust(bottom=0.15)
                 st.pyplot(fig)
 
             except Exception as e:
