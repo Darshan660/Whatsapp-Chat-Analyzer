@@ -101,7 +101,12 @@ if uploaded_file is not None:
                 daily_timeline = helper.daily_timeline(selected_user, df)
                 fig, ax = plt.subplots()
                 ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='green', marker=".")
-                plt.xticks(rotation='vertical')
+                # Will create interval only if the data is above 30
+                if len(timeline['time']) > 30:
+                    x_ticks = np.arange(0, len(timeline['time']), 2)  # set interval to 7 days
+                    plt.xticks(x_ticks, timeline['time'][x_ticks], rotation='vertical')
+                else:
+                    plt.xticks(rotation='vertical')
                 st.pyplot(fig)
 
             except Exception as e:
