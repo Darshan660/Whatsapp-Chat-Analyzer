@@ -109,7 +109,8 @@ if uploaded_file is not None:
                     x_ticks = np.arange(0, len(daily_timeline['time']), 2)  # set interval to 2 days
                     plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
                 else:
-                    plt.xticks(rotation='vertical')
+                    x_ticks = np.arange(0, len(daily_timeline['time']), 2)  # set interval to 2 days
+                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
                 st.pyplot(fig)
                 
 
