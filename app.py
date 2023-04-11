@@ -162,7 +162,7 @@ if uploaded_file is not None:
                                  unsafe_allow_html=True)
                     else:
                         fig, ax = plt.subplots()
-                        ax.imshow(df_wc, interpolation='bilinear')
+                        ax.imshow(df_wc, interpolation='bicubic')
                         st.pyplot(fig)
 
                 result_placeholder.write()  # Update the placeholder element with the result
