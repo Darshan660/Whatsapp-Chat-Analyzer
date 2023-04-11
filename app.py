@@ -1,7 +1,7 @@
 import streamlit as st
 import preprocessor,helper
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
+from datetime import datetime
 import seaborn as sns
 import plotly.graph_objs as go
 import base64
@@ -99,11 +99,11 @@ if uploaded_file is not None:
                 # Daily Timeline
                 st.title("Daily Timeline")
                 daily_timeline = helper.daily_timeline(selected_user, df)
+                daily_timeline['only_date_str'] = daily_timeline['only_date'].apply(lambda x: x.strftime('%d %b'))
                 fig, ax = plt.subplots()
                 ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='green', marker=".")
-                ax.xaxis.set_major_locator(mdates.DayLocator())  # Set the x-axis locator to daily
-                ax.xaxis.set_major_formatter(mdates.DateFormatter('%d %b'))  # Format the x-axis labels to show day and month
-                plt.xticks(rotation='vertical')
+                ax.set_xticks(daily_timeline['only_date'])  # Set the x-ticks to the original only_date values
+                ax.set_xticklabels(daily_timeline['only_date_str'], rotation='vertical')  # Set the x-tick labels to the formatted string
                 st.pyplot(fig)
 
             except Exception as e:
