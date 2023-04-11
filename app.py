@@ -104,9 +104,9 @@ if uploaded_file is not None:
                 # Will create interval only if the data is above 30
                 if len(daily_timeline['time']) > 30:
                     x_ticks = np.arange(0, len(daily_timeline['time']), 2)  # set interval to 2 days
-                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
+                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical', ha='right') # Set ha='right' for alignment
                 else:
-                    plt.xticks(rotation='vertical')
+                    plt.xticks(rotation='vertical', ha='right') # Set ha='right' for alignment
                 st.pyplot(fig)
                 
 
