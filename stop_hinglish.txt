@@ -245,6 +245,7 @@ for
 forth
 four
 from
+fs
 further
 furthermore
 gaya
@@ -685,6 +686,7 @@ phli
 placed
 please
 plus
+pm
 poora
 poori
 provides
