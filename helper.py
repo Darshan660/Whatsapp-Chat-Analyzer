@@ -243,7 +243,7 @@ def daily_timeline(selected_user,df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
-    daily_timeline = df.groupby(['only_date','month','day']).count()['message'].reset_index()
+    daily_timeline = df.groupby(['year','month','day','only_date']).count()['message'].reset_index()
     
     time = []
     for i in range(daily_timeline.shape[0]):
