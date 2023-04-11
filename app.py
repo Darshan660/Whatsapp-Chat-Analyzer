@@ -102,10 +102,11 @@ if uploaded_file is not None:
                 daily_timeline['only_date_str'] = daily_timeline['only_date'].apply(lambda x: x.strftime('%d %b'))
                 fig, ax = plt.subplots()
                 ax.plot(daily_timeline['only_date'], daily_timeline['message'], color='green', marker=".")
-                plt.xticks(ticks=daily_timeline['only_date'][::5], labels=daily_timeline['only_date_str'][::5], rotation=45, ha='right', fontsize=8)
-                ax.set_xticklabels(daily_timeline['only_date_str'], rotation=45, ha='right', fontsize=8)  # Adjust the rotation angle, alignment, and fontsize of x-tick labels
+                ax.set_xticks(daily_timeline['only_date'][::5])  # Set the x-tick locations
+                ax.set_xticklabels(daily_timeline['only_date_str'][::5], rotation=45, ha='right', fontsize=8)  # Set the x-tick labels with rotation, alignment, and fontsize adjustments
                 plt.subplots_adjust(bottom=0.15)
                 st.pyplot(fig)
+
 
             except Exception as e:
                 st.error(f"Error occured is: {e}")  # Display an error message if an exception is raised
