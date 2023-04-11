@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import nltk
 nltk.download('vader_lexicon')
+from datetime import datetime
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 extract = URLExtract()
@@ -238,16 +239,18 @@ def monthly_timeline(selected_user,df):
 
     return timeline
 
-def daily_timeline(selected_user,df):
+def daily_timeline(selected_user, df):
 
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
-    daily_timeline = df.groupby(['year','month','day','only_date']).count()['message'].reset_index()
-    
+    daily_timeline = df.groupby(['only_date']).count()['message'].reset_index()
+
     time = []
     for i in range(daily_timeline.shape[0]):
-        time.append(daily_timeline['month'][i] + "-" + str(daily_timeline['day'][i]))
+        time.append(datetime.strftime(daily_timeline['only_date'][i], '%b-%d'))
+
+    daily_timeline['time'] = time
 
     return daily_timeline
 
