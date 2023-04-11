@@ -94,6 +94,9 @@ if uploaded_file is not None:
                     plt.xticks(x_ticks, timeline['time'][x_ticks], rotation='vertical')
                 else:
                     plt.xticks(rotation='vertical')
+                   # Adjust plot margins and layout
+                plt.subplots_adjust(bottom=0.2)
+                plt.margins(x=0)
                 st.pyplot(fig)
 
                 # Daily Timeline
