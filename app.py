@@ -93,7 +93,7 @@ if uploaded_file is not None:
                 timeline = helper.monthly_timeline(selected_user, df)
                 # Plot the line chart using `st_echarts`
                 options = {
-                    'xAxis': {'type': 'category', 'data': timeline['time'].tolist(), 'axisLabel': {'rotate': 90}},
+                    'xAxis': {'type': 'category', 'data': timeline['time'].tolist(), 'axisLabel': {'rotate': 90,'fontSize':9}},
                     'yAxis': {'type': 'value'},
                     'series': [{'type': 'line', 'data': timeline['message'].tolist()}],
                     'tooltip': {'trigger': 'axis'},
