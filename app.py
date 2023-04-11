@@ -33,8 +33,11 @@ def download_file():
     href = f'<a href="data:file/txt;base64,{b64}" download="test.txt">Download file</a>'
     st.sidebar.markdown(href, unsafe_allow_html=True)
 
+# Add a expander
+expand_sidebar = st.sidebar.checkbox("Click to know why to download")
+if expand_sidebar:
+    st.sidebar.caption("Download the test file for analyzing Whatsapp chats (useful if you don't have any chats to upload) or upload your own chats for analysis")
 # Add download button to sidebar
-st.sidebar.caption("Click on the Download button to download the test file to Analyze Whatsapp Chats (If you don't have any)")
 if st.sidebar.button('Download File'):
     download_file()
 
