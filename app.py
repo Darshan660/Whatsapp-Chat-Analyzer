@@ -103,7 +103,7 @@ if uploaded_file is not None:
                 ax.plot(daily_timeline['time'], daily_timeline['message'], color='green', marker=".")
                 # Will create interval only if the data is above 30
                 if len(daily_timeline['time']) >=100:
-                    x_ticks = np.arange(0, len(daily_timeline['time']), 18)  # set interval to 18 days
+                    x_ticks = np.arange(0, len(daily_timeline['time']), 16)  # set interval to 16 days
                     plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
                 elif len(daily_timeline['time']) >=35:
                     x_ticks = np.arange(0, len(daily_timeline['time']), 2)  # set interval to 2 days
