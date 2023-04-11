@@ -6,6 +6,7 @@ import seaborn as sns
 import plotly.graph_objs as go
 import base64
 import numpy as np
+import pandas as pd
 from pathlib import Path
 from streamlit_echarts import st_echarts
 
