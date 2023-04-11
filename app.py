@@ -114,7 +114,7 @@ if uploaded_file is not None:
                 # Define the chart options
                 chart_options = {
                     'xAxis': {'type': 'category', 'data': daily_timeline['only_date'].tolist(),
-                              'axisLabel': {'rotate': 90}},
+                              'axisLabel': {'rotate': 90,'fontSize':11}},
                     'yAxis': {'type': 'value'},
                     'series': [{'type': 'line', 'data': daily_timeline['message'].tolist()}],
                     'tooltip': {'trigger': 'axis'}
