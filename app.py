@@ -90,13 +90,10 @@ if uploaded_file is not None:
                 ax.plot(timeline['time'], timeline['message'], color='green', marker=".")
                 # Will create interval only if the data is above 30
                 if len(timeline['time']) > 30:
-                    x_ticks = np.arange(0, len(timeline['time']), 2)  # set interval to 7 days
+                    x_ticks = np.arange(0, len(timeline['time']), 2)  # set interval to 2 days
                     plt.xticks(x_ticks, timeline['time'][x_ticks], rotation='vertical')
                 else:
                     plt.xticks(rotation='vertical')
-                   # Adjust plot margins and layout
-                plt.subplots_adjust(bottom=0.2)
-                plt.margins(x=0)
                 st.pyplot(fig)
 
                 # Daily Timeline
@@ -107,12 +104,9 @@ if uploaded_file is not None:
                 # Will create interval only if the data is above 30
                 if len(daily_timeline['time']) > 30:
                     x_ticks = np.arange(0, len(daily_timeline['time']), 2)  # set interval to 2 days
-                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical', ha='right') # Set ha='right' for alignment
+                    plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical')
                 else:
-                    plt.xticks(rotation='vertical', ha='right') # Set ha='right' for alignment
-                   # Adjust plot margins and layout
-                plt.subplots_adjust(bottom=0.2)
-                plt.margins(x=0)
+                    plt.xticks(rotation='vertical')
                 st.pyplot(fig)
                 
 
