@@ -110,6 +110,9 @@ if uploaded_file is not None:
                     plt.xticks(x_ticks, daily_timeline['time'][x_ticks], rotation='vertical', ha='right') # Set ha='right' for alignment
                 else:
                     plt.xticks(rotation='vertical', ha='right') # Set ha='right' for alignment
+                   # Adjust plot margins and layout
+                plt.subplots_adjust(bottom=0.2)
+                plt.margins(x=0)
                 st.pyplot(fig)
                 
 
