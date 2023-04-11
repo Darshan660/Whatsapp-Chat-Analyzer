@@ -248,6 +248,8 @@ def daily_timeline(selected_user, df):
 
     time = []
     for i in range(daily_timeline.shape[0]):
+        month = str(daily_timeline['only_date'][i].month).zfill(2)  # Extract month and pad with leading zeros if necessary
+        day = str(daily_timeline['only_date'][i].day).zfill(2)  # Extract day and pad with leading zeros if necessary
         time.append(datetime.strftime(daily_timeline['only_date'][i], '%b-%d'))
 
     daily_timeline['time'] = time
