@@ -244,6 +244,10 @@ def daily_timeline(selected_user,df):
         df = df[df['user'] == selected_user]
 
     daily_timeline = df.groupby('only_date').count()['message'].reset_index()
+    
+    time = []
+    for i in range(daily_timeline.shape[0]):
+        time.append(daily_timeline['month'][i] + "-" + str(timeline['day'][i]))
 
     return daily_timeline
 
