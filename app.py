@@ -10,14 +10,46 @@ import pandas as pd
 from pathlib import Path
 from streamlit_echarts import st_echarts
 
-# --- PATH SETTINGS ---
-current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
-css_file = current_dir / "styles" / "main.css"
 
 # --- GENERAL SETTINGS ---
 PAGE_TITLE = "WhatsApp Chat Analyzer"
 PAGE_ICON = ":mag_right:"
 st.set_page_config(page_title=PAGE_TITLE, page_icon=PAGE_ICON)
+
+def add_bg_from_local(image_files):
+    with open(image_files[0], "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+    with open(image_files[1], "rb") as image_file:
+        encoded_string1 = base64.b64encode(image_file.read())
+    with open(image_files[2], "rb") as image_file:
+        encoded_string2 = base64.b64encode(image_file.read())
+    st.markdown(
+    """
+    <style>
+      .stApp {
+          background-image: url(data:image/png;base64,"""+encoded_string.decode()+""");
+          background-size: cover;
+      }
+      .css-6qob1r.e1fqkh3o3 {
+        background-image: url(data:image/png;base64,"""+encoded_string1.decode()+""");
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+      .css-1avcm0n e8zbici2{
+        background-image: url(data:image/png;base64,"""+encoded_string2.decode()+""");
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+    </style>"""
+    ,
+    unsafe_allow_html=True
+    )
+add_bg_from_local([r'rotate.jpg', r'rotate.jpg', r'rotate.jpg'])
+
+
+# --- PATH SETTINGS ---
+current_dir = Path(__file__).parent if "__file__" in locals() else Path.cwd()
+css_file = current_dir / "styles" / "main.css"
 
 # --- LOAD CSS---
 with open(css_file) as f:
